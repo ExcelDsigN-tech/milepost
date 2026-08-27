@@ -38,6 +38,13 @@ function loadCandidates(programmeId: string): string[] {
   return SEEDED_PAYEES[programmeId] ?? [];
 }
 
+async function calculateSha256(text: string): Promise<Buffer> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return Buffer.from(hashBuffer);
+}
+
 export const RecipientDashboard = () => {
   const { address: walletAddress } = useWallet();
   const { client: programme, id: programmeId } = useProgramme();

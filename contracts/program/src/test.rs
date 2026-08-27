@@ -68,7 +68,15 @@ fn setup_with(quorum: u32, reviewer_count: u32, tranches: u32) -> Fixture {
     let mint = StellarAssetClient::new(&env, &asset.address());
 
     let creator = Address::generate(&env);
-    let treasury = Address::generate(&env);
+    let signer1 = Address::generate(&env);
+    let signer2 = Address::generate(&env);
+    let treasury = env.register(
+        milepost_treasury::Treasury,
+        (
+            vec![&env, signer1.clone(), signer2.clone()],
+            2u32,
+        ),
+    );
     let verifier = Address::generate(&env);
 
     let attest_id = env.register(milepost_attest::Attest, ());
