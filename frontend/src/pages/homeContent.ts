@@ -67,3 +67,44 @@ export const ROLES: Role[] = [
     ],
   },
 ];
+
+export interface Claim {
+  title: string;
+  detail: string;
+}
+
+/**
+ * What the contracts promise. Each line is checked against the module docs in
+ * `contracts/program/src/lib.rs` (budget, refund, sweep) and
+ * `contracts/record/src/lib.rs` (standing), not paraphrased from memory.
+ */
+export const GUARANTEES: Claim[] = [
+  {
+    title: 'The budget is never exceeded',
+    detail: 'Awards that would overspend are rejected by the contract, whatever order they arrive in.',
+  },
+  {
+    title: 'Unused money goes back',
+    detail:
+      'Once the release window closes, contributors can claim back their share of anything never paid out, in proportion to what they put in. What nobody claims is swept to the treasury after a grace period.',
+  },
+  {
+    title: 'Standing travels with the recipient',
+    detail:
+      'A non-transferable record of what someone received and delivered, across every programme, that the next funder can underwrite against.',
+  },
+];
+
+/** What they don't. Stated at the same weight as the guarantees, on purpose. */
+export const LIMITS: Claim[] = [
+  {
+    title: 'Anyone can finalize, so order matters',
+    detail:
+      'Finalize is permissionless so no one can strand an applicant by not pressing a button. When a programme is oversubscribed, whoever finalizes first decides who is funded. The budget is protected; ordering fairness is not.',
+  },
+  {
+    title: 'Published lists are advisory',
+    detail:
+      'The index is rebuilt from events every few hours. Every entry is re-checked on-chain before it is acted on.',
+  },
+];
