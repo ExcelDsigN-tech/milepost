@@ -487,6 +487,70 @@ code {
   font-family: monospace;
 }
 
+/* Roles */
+.roles-section {
+  scroll-margin-top: var(--space-8);
+}
+
+.role-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--grid-min-card)), 1fr));
+  gap: var(--space-3);
+}
+
+.role-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  background: var(--surface-color);
+  border-radius: var(--radius-lg);
+}
+
+.role-card .eyebrow {
+  margin-bottom: 0;
+}
+
+.role-card h3 {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  line-height: 1.25;
+}
+
+/* Pushes the links to the bottom so they line up across cards of unequal copy. */
+.role-card p {
+  flex: 1;
+  margin: 0;
+}
+
+.role-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-4);
+}
+
+.role-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--accent-strong);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+.role-links a:hover {
+  text-decoration: underline;
+}
+
+.role-note {
+  max-width: 72ch;
+  margin: var(--space-5) 0 0;
+  padding: var(--space-4) var(--space-5);
+  background: var(--accent-soft);
+  border-radius: var(--radius-md);
+  line-height: 1.6;
+}
+
 /* For developers */
 .eyebrow {
   display: block;

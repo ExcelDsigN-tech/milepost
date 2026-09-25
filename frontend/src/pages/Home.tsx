@@ -4,6 +4,7 @@ import './Home.css';
 import { Shield, Zap, Lock, Unlock } from 'lucide-react';
 import { CopyButton } from '../components/ui/CopyButton';
 import { HeroDemo } from '../components/landing/HeroDemo';
+import { ROLES } from './homeContent';
 
 /**
  * Repository docs and README describe one repository — the public
@@ -225,6 +226,38 @@ export const Home: React.FC = () => {
             </Link>
           </div>
         </div>
+      </section>
+
+      {/* Roles */}
+      <section id="roles" className="roles-section scroll-animate" aria-labelledby="roles-heading">
+        <div className="section-header">
+          <span className="eyebrow">Roles</span>
+          <h2 id="roles-heading">Four people, one programme.</h2>
+        </div>
+
+        <div className="role-grid">
+          {ROLES.map((role) => (
+            <article key={role.role} className="role-card">
+              <span className="eyebrow">{role.role}</span>
+              <h3>{role.does}</h3>
+              <p className="text-muted">{role.body}</p>
+              <nav className="role-links" aria-label={`${role.role} pages`}>
+                {role.links.map((link) => (
+                  <Link key={link.path} to={link.path}>
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
+            </article>
+          ))}
+        </div>
+
+        <p className="role-note">
+          <strong>Reviewers and verifiers are different jobs.</strong> Reviewers set the amount: each
+          votes on what an applicant should get, and the award is the median of their votes.
+          Verifiers unlock the payment: they confirm a condition was met, which releases one tranche
+          of an amount already set. Both work from the verifier dashboard, in separate sections.
+        </p>
       </section>
 
       {/* For developers */}
