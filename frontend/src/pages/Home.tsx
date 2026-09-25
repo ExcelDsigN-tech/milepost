@@ -35,18 +35,21 @@ const CONTRACTS = [
     name: 'program',
     description: 'One funding round: contributions, applications, review, awards, release, refunds.',
   },
-  { name: 'attest', description: 'General-purpose, schema-based attestation registry.' },
-  { name: 'record', description: 'Portable recipient standing — aggregates only, never a list.' },
+  {
+    name: 'attest',
+    description: 'General-purpose, schema-based attestations. Knows nothing else about the protocol.',
+  },
+  { name: 'record', description: 'Portable, non-transferable standing. Counts and totals, never a list.' },
   {
     name: 'policy_spend',
-    description: 'A policy signer limiting a smart wallet to one asset, verified payees and a cap.',
+    description: 'Policy signer for smart wallets: one asset, verified payees, a cap.',
   },
 ];
 
 const INDEXER = {
   name: 'milepost-indexer',
   href: 'https://github.com/milepost-labs/milepost-indexer',
-  description: 'Reads contract events and republishes programme and award lists as static JSON.',
+  description: 'Reads contract events and publishes JSON lists, because the contracts keep none.',
 };
 
 export const Home: React.FC = () => {
@@ -254,25 +257,27 @@ export const Home: React.FC = () => {
 
       {/* For developers */}
       <section id="developers" className="developers-section scroll-animate">
-        <div className="section-header">
-          <span className="eyebrow">For developers</span>
-          <h2>Five contracts, typed bindings, a public index.</h2>
-        </div>
+        <div className="developers-intro">
+          <div className="section-header">
+            <span className="eyebrow">For developers</span>
+            <h2>Five contracts, typed bindings, a public index.</h2>
+          </div>
 
-        <div className="install-block">
-          <pre className="install-command">
-            <code>{INSTALL_COMMAND}</code>
-          </pre>
-          <CopyButton value={INSTALL_COMMAND} label="Copy install command" showLabel />
-        </div>
+          <div className="install-block">
+            <pre className="install-command">
+              <code>{INSTALL_COMMAND}</code>
+            </pre>
+            <CopyButton value={INSTALL_COMMAND} label="Copy install command" showLabel />
+          </div>
 
-        <nav className="doc-links" aria-label="Documentation">
-          {DOC_LINKS.map((link) => (
-            <a key={link.label} href={link.href} target="_blank" rel="noreferrer noopener">
-              {link.label}
-            </a>
-          ))}
-        </nav>
+          <nav className="doc-links" aria-label="Documentation">
+            {DOC_LINKS.map((link) => (
+              <a key={link.label} href={link.href} target="_blank" rel="noreferrer noopener">
+                {link.label}
+              </a>
+            ))}
+          </nav>
+        </div>
 
         <ul className="contract-list">
           {CONTRACTS.map((contract) => (
@@ -299,6 +304,7 @@ export const Home: React.FC = () => {
       <footer className="landing-footer" role="contentinfo">
         <div className="landing-footer-inner">
           <span className="landing-footer-brand">Milepost</span>
+          <span className="landing-footer-note">Pre-audit · testnet only</span>
           <nav className="landing-footer-links" aria-label="Footer">
             <a href={REPO_URL} target="_blank" rel="noreferrer noopener">
               Repository
