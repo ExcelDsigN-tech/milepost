@@ -37,6 +37,11 @@
      compared vertically, so this matters more than it sounds. */
   --font-numeric: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
 
+  /* Minimum column widths for auto-fit grids: a column narrower than this
+     wraps to the next row instead of squeezing its content. */
+  --grid-min-card: 16rem;
+  --grid-min-column: 26rem;
+
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;

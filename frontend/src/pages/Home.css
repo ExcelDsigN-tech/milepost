@@ -569,7 +569,7 @@ code {
 
 .developers-section {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--grid-min-column)), 1fr));
   gap: var(--space-7);
   align-items: start;
   padding: var(--space-8) 0;
