@@ -243,6 +243,9 @@
   font-size: 1.25rem;
 }
 
+/* Used across this page's markup but never defined, so every muted line was
+   rendering in the main text colour. */
+.text-muted { color: var(--text-muted); }
 .text-error { color: var(--color-error); }
 .text-success { color: var(--color-success); }
 
