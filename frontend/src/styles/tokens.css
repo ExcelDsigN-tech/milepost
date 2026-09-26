@@ -150,6 +150,9 @@
   /* Eyebrow/label text and hover links — a step darker than --accent so it
      holds up as small, non-bold text. Used first by the landing sections. */
   --accent-strong: hsl(215, 80%, 32%);
+  /* --success is 3.96:1 on white, under AA for small text. Use this for
+     text; keep --success for fills and icons. */
+  --success-strong: hsl(158, 73%, 27%);
   /* Tinted fill for info notes. Derived from --accent so it follows the theme. */
   --accent-soft: color-mix(in srgb, var(--accent) 10%, transparent);
   /* The developers-section code block is dark in both themes; code is read
@@ -169,6 +172,7 @@
   --refund-soft: rgba(240, 160, 139, 0.14);
   --success-soft: rgba(111, 211, 162, 0.14);
   --warning-soft: rgba(242, 198, 97, 0.14);
+  --success-strong: hsl(158, 60%, 62%);
   --code: #0f1216;
   --code-text: #d8dce2;
   --elevation-1: 0 1px 2px rgba(0, 0, 0, 0.4);

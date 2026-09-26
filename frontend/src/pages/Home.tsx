@@ -4,6 +4,7 @@ import './Home.css';
 import { Shield, Zap, Lock, Unlock } from 'lucide-react';
 import { CopyButton } from '../components/ui/CopyButton';
 import { HeroDemo } from '../components/landing/HeroDemo';
+import { GUARANTEES, LIMITS, ROLES, type Claim } from './homeContent';
 import { ROLES } from './homeContent';
 
 /**
@@ -53,6 +54,34 @@ const INDEXER = {
   href: 'https://github.com/milepost-labs/milepost-indexer',
   description: 'Reads contract events and publishes JSON lists, because the contracts keep none.',
 };
+
+/**
+ * Both columns render through this one component so neither can drift into
+ * being visually quieter than the other: only the heading colour differs.
+ */
+function ClaimCard({
+  heading,
+  tone,
+  claims,
+}: {
+  heading: string;
+  tone: 'guaranteed' | 'limit';
+  claims: Claim[];
+}) {
+  return (
+    <div className="claim-card">
+      <h3 className={`claim-card-heading claim-card-heading--${tone}`}>{heading}</h3>
+      <dl>
+        {claims.map((claim) => (
+          <div key={claim.title} className="claim">
+            <dt>{claim.title}</dt>
+            <dd className="text-muted">{claim.detail}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
 
 export const Home: React.FC = () => {
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -258,6 +287,19 @@ export const Home: React.FC = () => {
           Verifiers unlock the payment: they confirm a condition was met, which releases one tranche
           of an amount already set. Both work from the verifier dashboard, in separate sections.
         </p>
+      </section>
+
+      {/* Guarantees and limits */}
+      <section className="limits-section scroll-animate" aria-labelledby="limits-heading">
+        <div className="section-header">
+          <span className="eyebrow">Guarantees and limits</span>
+          <h2 id="limits-heading">What the contracts promise, and what they don't.</h2>
+        </div>
+
+        <div className="claims-grid">
+          <ClaimCard heading="Guaranteed" tone="guaranteed" claims={GUARANTEES} />
+          <ClaimCard heading="Limits, stated" tone="limit" claims={LIMITS} />
+        </div>
       </section>
 
       {/* For developers */}
