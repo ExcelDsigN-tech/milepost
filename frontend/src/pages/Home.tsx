@@ -5,6 +5,7 @@ import { Shield, Zap, Lock, Unlock } from 'lucide-react';
 import { CopyButton } from '../components/ui/CopyButton';
 import { HeroDemo } from '../components/landing/HeroDemo';
 import { GUARANTEES, LIMITS, ROLES, type Claim } from './homeContent';
+import { ROLES } from './homeContent';
 
 /**
  * Repository docs and README describe one repository — the public
