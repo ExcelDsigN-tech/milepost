@@ -42,5 +42,6 @@ export interface HomeAnchor {
 
 export const HOME_ANCHORS: HomeAnchor[] = [
   { id: 'how', label: 'How it works' },
+  { id: 'roles', label: 'Roles' },
   { id: 'developers', label: 'Developers' },
 ];

@@ -150,6 +150,8 @@
   /* Eyebrow/label text and hover links — a step darker than --accent so it
      holds up as small, non-bold text. Used first by the landing sections. */
   --accent-strong: hsl(215, 80%, 32%);
+  /* Tinted fill for info notes. Derived from --accent so it follows the theme. */
+  --accent-soft: color-mix(in srgb, var(--accent) 10%, transparent);
   /* The developers-section code block is dark in both themes; code is read
      against a fixed console-style background, not the page surface. */
   --code: #16191e;
