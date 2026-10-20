@@ -25,11 +25,6 @@ policy-spend SpendError::AlreadyConfigured  Never returned by any entry point.
 # out of scope for the check itself (#551); each entry comes out with the PR
 # that adds its test, which the stale-entry rule enforces.
 
-attest Error::CycleDetected  Reachable, test pending (see #551).
-attest-integration Error::AttestationInvalid  Reachable, test pending (see #551).
-policy-spend SpendError::InvalidAmount  Reachable, test pending (see #551).
-policy-spend SpendError::AlreadyPayee  Reachable, test pending (see #551).
-policy-spend SpendError::NotPayee  Reachable, test pending (see #551).
 program Error::NoReviewers  Reachable, test pending (see #551).
 program Error::Overflow  Reachable, test pending (see #551).
 program Error::NoVerifiers  Reachable, test pending (see #551).
