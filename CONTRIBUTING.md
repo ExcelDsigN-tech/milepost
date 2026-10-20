@@ -295,6 +295,19 @@ If you are modifying the Soroban smart contracts, error codes are part of the co
 
 Why this matters: Stellar contract error codes propagate as `u32` values in the transaction result. If we reused a previously published discriminant, an indexer or bot that matches on that numeric value could silently misinterpret a new error as an old, unrelated one.
 
+### Every error variant needs a test
+
+CI fails if a `#[contracterror]` variant is never asserted by its own contract's tests (`contracts/<name>/src/*test*.rs`). A test counts if it names the variant as `Enum::Variant` (e.g. `Error::FeeTooHigh`) or matches its code as `Error(Contract, #N)`. Mentions in comments do not count, and when two enums in one contract share a code, only the name does. Placeholders for removed variants (underscored names, rule 2 above) are skipped.
+
+Run it locally from the repository root (no build needed):
+
+```bash
+./scripts/check-untested-errors.py              # the check CI runs
+python3 scripts/check-untested-errors.test.py   # its own tests
+```
+
+If you add a variant, add a test that returns it. If a variant genuinely cannot be reached, list it in `scripts/untested-errors-allowlist.txt` as `<contract> <Enum>::<Variant>  <reason>`. An entry without a reason fails, and so does an entry for a variant that is now tested or no longer exists, so when you write the missing test, delete its line in the same PR.
+
 ---
 
 ## 8. Release Process

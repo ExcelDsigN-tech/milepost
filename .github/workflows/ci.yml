@@ -50,6 +50,14 @@ jobs:
       - name: Validate contract documentation
         run: ./scripts/check-docs.sh
 
+      # An error variant no test asserts is a guard nobody would notice
+      # removing. Unreachable variants are allowlisted with a reason in
+      # scripts/untested-errors-allowlist.txt; stale entries fail too.
+      - name: Check every contract error is tested
+        run: |
+          python3 scripts/check-untested-errors.test.py
+          ./scripts/check-untested-errors.py
+
       # Bindings in packages/ are generated from this wasm and checked in. If a
       # contract interface changes and nobody regenerates them, the frontend
       # only finds out after a transaction is already submitted. Fail here
