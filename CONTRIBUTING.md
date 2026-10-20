@@ -86,6 +86,22 @@ tests decode events through the bindings' own specs, so they fail on it.
 
 CI does the same on every PR, in the `bindings` job.
 
+The same job also installs the packages the way an integrator would. If you
+change anything in `packages/*/package.json` (`exports`, `typings`, `type`,
+`files`), run this after building the packages:
+
+```bash
+./scripts/check-bindings-consumable.sh
+```
+
+It packs all five packages, installs the tarballs into an empty project,
+imports each one under Node ESM and typechecks a file that constructs every
+`Client` with `tsc --noEmit` (`module: nodenext`). A broken `exports` map or a
+missing type file fails it, even though `npm pack --dry-run` would not notice.
+It needs network access to the npm registry. Build the packages first with
+`npm ci && npm run build` in each `packages/<name>`, or by running
+`./scripts/frontend-with-local-bindings.sh`, which builds them on the way.
+
 The same job fails if a component shows a `FIXTURE_*` stand-in without its
 "Sample data" tag. See [Sample data](frontend/CONTRIBUTING.md#sample-data) in
 the frontend guide for the rule, the allowlist and how to run the check

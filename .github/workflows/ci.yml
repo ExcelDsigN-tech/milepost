@@ -163,6 +163,12 @@ jobs:
       - name: Verify bindings are publishable
         run: ./scripts/check-bindings-publishable.sh
 
+      # The file list above cannot see a broken `exports` map, a missing type
+      # file or an ESM-only import. Install the real tarballs into an empty
+      # project and use them the way an integrator would.
+      - name: Install, import and typecheck each binding package
+        run: ./scripts/check-bindings-consumable.sh
+
       - name: Build the app against local bindings
         run: npm run build --prefix frontend
 
