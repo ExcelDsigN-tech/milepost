@@ -11,6 +11,7 @@ import { SAMPLE_TX_DELAY_MS, sampleSendable, sampleOutcome } from '../../lib/fun
 import { useAnnouncer } from '../../context/useAnnouncer';
 import { Loading, ErrorState, TransactionOutcome } from '../state/AsyncStates';
 import { PendingPulse } from '../state/AsyncStates';
+import { TxExplorerLink } from '../ui';
 import './ApplyForm.css';
 
 interface ApplyFormProps {
@@ -373,8 +374,12 @@ export function ApplyForm({
             {receipt.txHash && (
               <div className="apply-done__detail">
                 <dt>Transaction</dt>
-                <dd className="numeric apply-done__hash" title={receipt.txHash}>
-                  {shortHash(receipt.txHash)}
+                <dd className="apply-done__tx">
+                  <span className="numeric apply-done__hash" title={receipt.txHash}>
+                    {shortHash(receipt.txHash)}
+                  </span>
+                  {/* A sample hash is a fixture the explorer has never seen. */}
+                  {!receipt.sample && <TxExplorerLink hash={receipt.txHash} />}
                 </dd>
               </div>
             )}

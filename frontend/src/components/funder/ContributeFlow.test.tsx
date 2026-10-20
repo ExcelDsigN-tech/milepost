@@ -158,6 +158,8 @@ describe('ContributeFlow — confirm, receipt and failure', () => {
     expect(await screen.findByText('Contribution confirmed')).toBeTruthy();
     expect(screen.getByText('4,853,391')).toBeTruthy();
     expect(screen.getByText(/Your money stays locked in the programme/)).toBeTruthy();
+    // A sample hash is a fixture, so it must not point at the explorer.
+    expect(screen.queryByRole('link', { name: /view on explorer/i })).toBeNull();
     await waitFor(() =>
       expect(mocks.announce).toHaveBeenCalledWith(
         'Contribution of 100 USDC to Community resilience grants 2026 confirmed.',
@@ -213,6 +215,11 @@ describe('ContributeFlow — confirm, receipt and failure', () => {
     expect(signAndSend).toHaveBeenCalledWith({ signTransaction: mocks.signTransaction });
     expect(screen.getByText('5,000,123')).toBeTruthy();
     expect(screen.queryByText('Sample receipt for the design phase.')).toBeNull();
+
+    const explorer = screen.getByRole('link', { name: /view on explorer.*new tab/i });
+    expect(explorer.getAttribute('href')).toBe(`https://stellar.expert/explorer/testnet/tx/${'ab'.repeat(32)}`);
+    expect(explorer.getAttribute('target')).toBe('_blank');
+    expect(explorer.getAttribute('rel')).toContain('noopener');
   });
 
   it('does not claim nothing moved when the failure is not a contract refusal', async () => {

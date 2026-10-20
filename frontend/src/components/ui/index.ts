@@ -19,3 +19,4 @@ export {
   type RadioOption,
   type DateFieldProps,
 } from './Inputs';
+export { TxExplorerLink, type TxExplorerLinkProps } from './TxExplorerLink';

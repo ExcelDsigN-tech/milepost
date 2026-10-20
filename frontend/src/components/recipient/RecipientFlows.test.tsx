@@ -624,6 +624,8 @@ describe('Recipient Issues Suite (#272, #273, #274, #275)', () => {
 
       // The receipt shows a metadata hash (hex chars).
       expect(screen.getByText(/Application hash/i)).toBeDefined();
+      // A sample hash is a fixture, so it must not point at the explorer.
+      expect(screen.queryByRole('link', { name: /view on explorer/i })).toBeNull();
     });
 
     it('real submission: calls programme.apply with stroops and a 32-byte hash, shows receipt', async () => {
@@ -672,6 +674,13 @@ describe('Recipient Issues Suite (#272, #273, #274, #275)', () => {
       // Receipt shows the tx hash and the metadata hash.
       expect(screen.getByText(/Application hash/i)).toBeDefined();
       expect(screen.getByText(/TESTHASH/i)).toBeDefined();
+
+      const explorer = screen.getByRole('link', { name: /view on explorer.*new tab/i });
+      expect(explorer.getAttribute('href')).toBe(
+        'https://stellar.expert/explorer/testnet/tx/TESTHASH1234567890ABCDEF'
+      );
+      expect(explorer.getAttribute('target')).toBe('_blank');
+      expect(explorer.getAttribute('rel')).toContain('noopener');
     });
 
     it('AlreadyApplied (error 9): shows the human explanation, not a generic error', async () => {

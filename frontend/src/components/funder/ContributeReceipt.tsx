@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import type { TxReceipt } from '../../lib/fundingTx';
 import { formatUsdc, shortId } from '../../lib/programmeView';
-import { CopyButton } from '../ui';
+import { CopyButton, TxExplorerLink } from '../ui';
 
 export interface ContributeReceiptProps {
   amount: bigint;
@@ -43,6 +43,8 @@ export function ContributeReceipt({
               {receipt.hash ? shortId(receipt.hash) : 'Not reported'}
             </span>
             {receipt.hash && <CopyButton value={receipt.hash} label="Copy transaction hash" />}
+            {/* A sample hash is a fixture the explorer has never seen. */}
+            {receipt.hash && !sample && <TxExplorerLink hash={receipt.hash} />}
           </dd>
         </div>
         <div>
