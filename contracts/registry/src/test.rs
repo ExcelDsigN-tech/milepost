@@ -3,7 +3,10 @@
 use super::*;
 use milepost_test_utils::assert_events;
 use milepost_test_utils::schedule::*;
-use soroban_sdk::{testutils::Address as _, testutils::Ledger as _, vec, Env, Event as _};
+use soroban_sdk::{
+    testutils::{Address as _, Ledger as _, MockAuth, MockAuthInvoke},
+    vec, ConversionError, Env, Event as _, Executable, IntoVal, InvokeError, Val,
+};
 
 // Requires the programme wasm to exist, so `cargo build --target wasm32v1-none
 // --release` must run before this crate's tests. CI builds wasm before testing
@@ -528,6 +531,127 @@ fn upgrading_the_registry_requires_the_admin() {
     // Drop the mocked authorisations so `require_auth` is actually enforced.
     f.env.set_auths(&[]);
     f.client.upgrade(&new_wasm);
+}
+
+// ---- admin authorisation ----
+//
+// Every admin entry point goes through `admin_config`, which calls
+// `require_auth` on the stored admin. `mock_all_auths` would satisfy that for
+// anyone, so these tests authorise exactly one address for exactly one call
+// and check that a signature from anyone but the admin moves nothing.
+
+/// Authorise `caller`, and only `caller`, for the next call to `fn_name`.
+fn authorise(f: &Fixture, caller: &Address, fn_name: &str, args: Vec<Val>) {
+    f.env.mock_auths(&[MockAuth {
+        address: caller,
+        invoke: &MockAuthInvoke {
+            contract: &f.client.address,
+            fn_name,
+            args,
+            sub_invokes: &[],
+        },
+    }]);
+}
+
+/// Everything an admin call could change: the protocol config (fee,
+/// treasury, policy, programme wasm, admin) and the registry's own code.
+fn snapshot(f: &Fixture) -> (Config, Option<Executable>) {
+    (f.client.get_config(), f.client.address.executable())
+}
+
+/// Assert a non-admin call failed on authorisation, published nothing and
+/// left the snapshot taken before it untouched.
+fn assert_refused(
+    f: &Fixture,
+    before: (Config, Option<Executable>),
+    result: Result<Result<(), ConversionError>, Result<Error, InvokeError>>,
+) {
+    // The host rejects the missing signature before the contract can return
+    // one of its own errors, so this is an abort, not `Error::NotAuthorized`.
+    assert_eq!(result, Err(Err(InvokeError::Abort)));
+    // Read events before the snapshot: any later call empties the buffer.
+    assert_events(&f.env, &f.client.address, &[]);
+    assert_eq!(snapshot(f), before);
+}
+
+#[test]
+fn a_non_admin_cannot_set_the_fee() {
+    let f = setup();
+    let intruder = Address::generate(&f.env);
+    let before = snapshot(&f);
+
+    authorise(&f, &intruder, "set_fee", (250u32,).into_val(&f.env));
+    assert_refused(&f, before, f.client.try_set_fee(&250));
+}
+
+#[test]
+fn a_non_admin_cannot_set_the_treasury() {
+    let f = setup();
+    let intruder = Address::generate(&f.env);
+    let before = snapshot(&f);
+
+    authorise(&f, &intruder, "set_treasury", (&intruder,).into_val(&f.env));
+    assert_refused(&f, before, f.client.try_set_treasury(&intruder));
+}
+
+#[test]
+fn a_non_admin_cannot_set_the_policy() {
+    let f = setup();
+    let intruder = Address::generate(&f.env);
+    let before = snapshot(&f);
+
+    authorise(&f, &intruder, "set_policy", (&intruder,).into_val(&f.env));
+    assert_refused(&f, before, f.client.try_set_policy(&intruder));
+}
+
+#[test]
+fn a_non_admin_cannot_set_the_programme_wasm() {
+    let f = setup();
+    let intruder = Address::generate(&f.env);
+    let wasm = milepost_test_utils::hash(&f.env, 9);
+    let before = snapshot(&f);
+
+    authorise(&f, &intruder, "set_program_wasm", (&wasm,).into_val(&f.env));
+    assert_refused(&f, before, f.client.try_set_program_wasm(&wasm));
+}
+
+#[test]
+fn a_non_admin_cannot_upgrade_the_registry() {
+    let f = setup();
+    let intruder = Address::generate(&f.env);
+    let wasm = f.env.deployer().upload_contract_wasm(programme::WASM);
+    let before = snapshot(&f);
+
+    authorise(&f, &intruder, "upgrade", (&wasm,).into_val(&f.env));
+    assert_refused(&f, before, f.client.try_upgrade(&wasm));
+}
+
+#[test]
+fn a_non_admin_cannot_take_over_administration() {
+    let f = setup();
+    let intruder = Address::generate(&f.env);
+    let before = snapshot(&f);
+
+    authorise(&f, &intruder, "set_admin", (&intruder,).into_val(&f.env));
+    assert_refused(&f, before, f.client.try_set_admin(&intruder));
+}
+
+#[test]
+fn handing_over_admin_refuses_the_old_admin_and_accepts_the_new() {
+    let f = setup();
+    let new_admin = Address::generate(&f.env);
+
+    authorise(&f, &f.admin, "set_admin", (&new_admin,).into_val(&f.env));
+    f.client.set_admin(&new_admin);
+    assert_eq!(f.client.get_config().admin, new_admin);
+
+    let before = snapshot(&f);
+    authorise(&f, &f.admin, "set_fee", (250u32,).into_val(&f.env));
+    assert_refused(&f, before, f.client.try_set_fee(&250));
+
+    authorise(&f, &new_admin, "set_fee", (250u32,).into_val(&f.env));
+    f.client.set_fee(&250);
+    assert_eq!(f.client.get_config().fee_bps, 250);
 }
 
 // ---- events ----
