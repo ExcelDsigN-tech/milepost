@@ -30,6 +30,7 @@ attest-integration Error::AttestationInvalid  Reachable, test pending (see #551)
 policy-spend SpendError::InvalidAmount  Reachable, test pending (see #551).
 policy-spend SpendError::AlreadyPayee  Reachable, test pending (see #551).
 policy-spend SpendError::NotPayee  Reachable, test pending (see #551).
+program Error::NoReviewers  Reachable, test pending (see #551).
 program Error::Overflow  Reachable, test pending (see #551).
 program Error::NoVerifiers  Reachable, test pending (see #551).
 program Error::SchemaAuthorityNotVerifier  Reachable, test pending (see #551).

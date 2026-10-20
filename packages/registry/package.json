@@ -9,7 +9,7 @@
     "directory": "packages/registry"
   },
   "type": "module",
-  "exports": "./dist/missing.js",
+  "exports": "./dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
     "dist"
