@@ -1,5 +1,6 @@
 import { Buffer } from 'buffer';
 import type { AttestationFixture } from '../fixtures/attestationFixtures';
+import { extractCode } from './errors';
 import type { Client as AttestClient, Attestation } from '@milepost/attest';
 
 /** A Stellar account address (`G...`), the shape `subject` and `attester` take. */
@@ -54,6 +55,18 @@ export function validateVerifyClaimInput(input: VerifyClaimInput): VerifyClaimFi
   return errors;
 }
 
+/**
+ * Whether a failed `attest.get` means the attestation does not exist.
+ *
+ * `get` returns `Result<Attestation>`, and the SDK's `unwrap()` throws the
+ * variant's name ("AttestationNotFound") with no code. A call that fails in
+ * simulation carries the code instead (`Error(Contract, #3)`).
+ */
+function isAttestationNotFound(caught: unknown): boolean {
+  if (caught instanceof Error && caught.message === 'AttestationNotFound') return true;
+  return extractCode(caught) === 3;
+}
+
 export type VerifyClaimResult =
   | { valid: true; attestation?: Attestation }
   | { valid: false; reason: string; attestation?: Attestation };
@@ -84,9 +97,14 @@ export async function verifyClaimOnChain(
   try {
     const getResult = await attest.get({ uid: uidBuf });
     attestation = getResult.result.unwrap();
-  } catch {
-    // AttestationNotFound (error 3) — no record exists.
-    return { valid: false, reason: 'No attestation exists with this id.' };
+  } catch (caught) {
+    // Only AttestationNotFound (error 3) means there is no record. Anything
+    // else — an unreachable RPC, a timeout — is rethrown, so it is shown as a
+    // failed check rather than as an attestation that does not exist.
+    if (isAttestationNotFound(caught)) {
+      return { valid: false, reason: 'No attestation exists with this id.' };
+    }
+    throw caught;
   }
 
   // Then call verify — the authoritative boolean.

@@ -95,6 +95,23 @@ fn configure_stores_the_rules() {
 }
 
 #[test]
+fn the_steward_can_change_the_rules_later() {
+    // `configure` doubles as the update path: after the first call only the
+    // steward signs, so `AlreadyConfigured` is never raised for them.
+    let f = setup();
+    let cap = CAP + 1;
+    let period = PERIOD + 1;
+
+    f.client
+        .configure(&f.steward, &f.wallet, &f.token, &cap, &period);
+
+    let p = f.client.get_policy(&f.wallet);
+    assert_eq!(p.cap, cap);
+    assert_eq!(p.period, period);
+    assert_eq!(p.steward, f.steward);
+}
+
+#[test]
 fn a_stranger_cannot_take_over_a_configured_wallet() {
     // Otherwise anyone could point an existing recipient's policy at payees of
     // their choosing.
@@ -149,6 +166,42 @@ fn a_zero_cap_is_rejected() {
             .try_configure(&f.steward, &other, &f.token, &0, &PERIOD),
         Err(Ok(SpendError::InvalidCap))
     );
+}
+
+#[test]
+fn a_zero_transfer_is_rejected_without_changing_spend() {
+    let f = setup();
+    assert_denied(
+        f.client.try_policy__(
+            &f.wallet,
+            &signer(&f),
+            &transfer_context(&f, &f.wallet, &f.school, 0),
+        ),
+        SpendError::InvalidAmount,
+    );
+    assert_eq!(f.client.get_policy(&f.wallet).spent, 0);
+}
+
+#[test]
+fn allowing_an_existing_payee_is_rejected_without_changing_state() {
+    let f = setup();
+    assert_eq!(
+        f.client.try_allow_payee(&f.steward, &f.wallet, &f.school),
+        Err(Ok(SpendError::AlreadyPayee))
+    );
+    assert!(f.client.is_payee(&f.wallet, &f.school));
+}
+
+#[test]
+fn denying_a_missing_payee_is_rejected_without_changing_state() {
+    let f = setup();
+    let missing = Address::generate(&f.env);
+    assert_eq!(
+        f.client.try_deny_payee(&f.steward, &f.wallet, &missing),
+        Err(Ok(SpendError::NotPayee))
+    );
+    assert!(!f.client.is_payee(&f.wallet, &missing));
+    assert!(f.client.is_payee(&f.wallet, &f.school));
 }
 
 // ---- authorisation ----

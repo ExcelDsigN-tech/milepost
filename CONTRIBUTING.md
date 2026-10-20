@@ -112,6 +112,21 @@ CI also checks that every page and component CSS file uses design tokens
 spacing off the 4px scale. See [Design-system guard](frontend/CONTRIBUTING.md#design-system-guard)
 for details and how to run it locally (`npm run check:design-system --prefix frontend`
 or with `--diff-base <commit>` for diff mode).
+### Contract error explanations
+
+Every `#[contracterror]` variant in `contracts/` must have a plain-language
+explanation in `frontend/src/lib/errors.ts`, so no failure reaches a user as
+"unknown error". The `bindings` job checks both directions on every pull
+request: a code the app does not explain, and an explanation for a code the
+contract no longer has. Run it locally from the repository root:
+
+```bash
+python3 scripts/check-error-parity.py
+```
+
+It lists each mismatch by contract, code and variant name. When you add an
+error variant, add its entry to the matching table in the same pull request.
+
 ### Automated accessibility checks
 
 Every route in `frontend/src/routes.ts` is rendered in jsdom, in both the light
@@ -197,6 +212,18 @@ pull request. On a mismatch it:
 
 To fix a failing screenshot job: run `./scripts/update-snapshots.sh` locally,
 verify the diff is intentional, and push the updated PNGs.
+
+### Typechecking the examples
+
+The scripts in `examples/` show integrators how to use the published `@milepost/*` packages. CI typechecks them against the locally built bindings in the `bindings` job on every pull request, so a binding change that would break them fails the build rather than surprising an integrator.
+
+To run the same check locally after changing a contract or regenerating bindings:
+
+```bash
+./scripts/typecheck-examples.sh
+```
+
+It builds any binding package that has no `dist/` yet, installs the TypeScript version pinned in `examples/package-lock.json`, overlays the local bindings and typechecks every script.
 
 ---
 

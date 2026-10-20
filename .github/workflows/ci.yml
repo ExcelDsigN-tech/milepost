@@ -169,6 +169,11 @@ jobs:
       - name: Install, import and typecheck each binding package
         run: ./scripts/check-bindings-consumable.sh
 
+      # Every contract error must have a plain-language explanation in the app,
+      # and the app must not explain a code the contracts no longer have.
+      - name: Check the app explains every contract error
+        run: python3 ./scripts/check-error-parity.py
+
       - name: Build the app against local bindings
         run: npm run build --prefix frontend
 
@@ -244,6 +249,12 @@ jobs:
       # is the only place that needs to change when the policy changes.
       - name: Check npm dependencies for known advisories
         run: ./scripts/check-npm-advisories.sh
+
+      # The examples/ scripts show integrators how to call the published
+      # packages. Typecheck them against this checkout's bindings, built by the
+      # first step, so a binding change that would break them fails here.
+      - name: Typecheck examples against local bindings
+        run: ./scripts/typecheck-examples.sh
 
   accessibility:
     name: Accessibility checks
